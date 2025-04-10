@@ -1,2 +1,4 @@
 .pio
 secrets.h
+.zed
+proto_tests
