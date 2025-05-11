@@ -5,6 +5,7 @@
 
 #include <Wire.h>
 #include <MPU6500_WE.h>
+#include <cstddef>
 #include <cstdint>
 #include <vector>
 #define MPU6500_ADDR 0x68
@@ -30,15 +31,31 @@ WiFiClient client;
 
 
 // Create empty vectors of size 1000
-std::vector<float> gx(200, 0);
-std::vector<float> gy(200, 0);
-std::vector<float> gz(200, 0);
+// std::vector<float> gx(200, 0);
+// std::vector<float> gy(200, 0);
+// std::vector<float> gz(200, 0);
 std::vector<xyzFloat> acceleration(0);
 
-String generateCSV(const std::vector<float>& list_x, const std::vector<float>& list_y, const std::vector<float>& list_z) {
-    String csvData = "x,y,z\n";
-    for (size_t i = 0; i < list_x.size(); i++) {
-        csvData += String(list_x[i]) + "," + String(list_y[i]) + "," + String(list_z[i]) + "\n";
+std::vector<float> g(600, 0);
+
+
+// String generateCSV(const std::vector<float>& list_x, const std::vector<float>& list_y, const std::vector<float>& list_z) {
+//     String csvData = "x;y;z\n";
+//     for (size_t i = 0; i < list_x.size(); i++) {
+//         csvData += String(list_x[i]) + ";" + String(list_y[i]) + ";" + String(list_z[i]) + "\n";
+//     }
+//     return csvData;
+// }
+
+String generateCSV(const std::vector<float>& list) {
+    String csvData = "time (s);acceleration (g)\n";
+    for (size_t i = 0; i < list.size(); i++) {
+        size_t i_shifted = (i - 1) % list.size();
+        String g_string = String(list[i_shifted]);
+        g_string.replace('.', ',');
+        String time = String((float)i/10);
+        time.replace('.', ',');
+        csvData += time + ";" + g_string + "\n";
     }
     return csvData;
 }
@@ -179,7 +196,8 @@ void setup()
 
     server.on("/download", HTTP_GET, [](AsyncWebServerRequest* request) {
         Serial.println("ESP32 Web Server: Download request received");
-        String csvData = generateCSV(gx, gy, gz);
+        // String csvData = generateCSV(gx, gy, gz);
+        String csvData = generateCSV(g);
         request->send(200, "text/csv", csvData);
     });
 
@@ -195,13 +213,15 @@ void loop()
     float resultantG = myMPU6500.getResultantG(gValue);
     float temp = myMPU6500.getTemperature();
 
-    if (buff_i >= gx.size()) {
+    if (buff_i >= g.size()) {
         buff_i = 0;
         Serial.println("Reseting buffer index.");
     }
-    gx[buff_i] = gValue.x;
-    gy[buff_i] = gValue.y;
-    gz[buff_i] = gValue.z;
+    // gx[buff_i] = gValue.x;
+    // gy[buff_i] = gValue.y;
+    // gz[buff_i] = gValue.z;
+
+    g[buff_i] = resultantG;
 
     buff_i += 1;
 
@@ -229,5 +249,5 @@ void loop()
     Serial.println(temp);
     Serial.println();
 
-    delay(1000);
+    delay(100);
 }
