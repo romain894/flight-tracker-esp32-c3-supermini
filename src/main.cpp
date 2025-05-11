@@ -38,6 +38,8 @@ std::vector<xyzFloat> acceleration(0);
 
 std::vector<float> g(600, 0);
 
+uint16_t buff_i = 0;
+
 
 // String generateCSV(const std::vector<float>& list_x, const std::vector<float>& list_y, const std::vector<float>& list_z) {
 //     String csvData = "x;y;z\n";
@@ -50,7 +52,7 @@ std::vector<float> g(600, 0);
 String generateCSV(const std::vector<float>& list) {
     String csvData = "time (s);acceleration (g)\n";
     for (size_t i = 0; i < list.size(); i++) {
-        size_t i_shifted = (i - 1) % list.size();
+        size_t i_shifted = (buff_i + i) % list.size();
         String g_string = String(list[i_shifted]);
         g_string.replace('.', ',');
         String time = String((float)i/10);
@@ -60,7 +62,6 @@ String generateCSV(const std::vector<float>& list) {
     return csvData;
 }
 
-uint16_t buff_i = 0;
 
 void setup()
 {

@@ -7,7 +7,6 @@ const char* webpage = R"=====(
         <head>
             <meta name="viewport" content="width=device-width, initial-scale=1.0" />
             <title>Flight tracker</title>
-            <div>Download the flight data of the last 60 seconds at 10 Hz.
             <style>
                 html {
                     font-family: Verdana, sans-serif;
@@ -47,6 +46,8 @@ const char* webpage = R"=====(
         <body>
             <div class="container">
                 <h1>Flight tracker</h1>
+
+                <div>Download the flight data of the last 60 seconds at 10 Hz.</div>
 
                 <a href="download"
                     ><button class="button button-data">Download Data</button></a
